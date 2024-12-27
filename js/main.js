@@ -242,7 +242,7 @@ function collision() {
   box_Y = 0;
   box_Z = 0; // サイズが合うように変えてみましょう。
   geometry = new BoxGeometry(box_X, box_Y, box_Z);
-  sphereMaterial = new MeshPhongMaterial({ color: 0xff0000 });
+  sphereMaterial = new MeshPhongMaterial({ color: 0x00ff00 });
   playerBox = new Mesh(geometry, sphereMaterial);
   playerBox.position.set(
     player.position.x,
@@ -251,7 +251,7 @@ function collision() {
   );
   playerBox.updateWorldMatrix(true, true);
   const playerBoundingBox = new Box3().setFromObject(playerBox);
-  helper = new Box3Helper(playerBoundingBox, 0xff0000);
+  helper = new Box3Helper(playerBoundingBox, 0x00ff00);
   scene.add(helper);
 
   // 障害物との衝突
