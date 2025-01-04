@@ -109,6 +109,29 @@ const textureloader = new TextureLoader();
 const glbloader = new GLTFLoader();
 
 // プレイヤーの描画
+glbloader.load(
+  glbUrls[0],
+  function (gltf) {
+    player = gltf.scene;
+    player.scale.set(2,2,2);
+    player.rotation.set(0, Math.PI, 0);
+    player.position.set(0, 0, 0);
+    mixer = new AnimationMixer(player); // 解説 1
+    const runningAction = gltf.animations.find(
+      (animation) => animation.name === "running"
+    ); // 解説 2
+    if (runningAction) {
+      mixer.clipAction(runningAction).play(); // 解説 3
+    } else {
+      console.warn("Running animation not found in the model.");
+    }
+    scene.add(player);
+  },
+  undefined,
+  function (error) {
+    console.error(error);
+  }
+);
 // ここに記述
 
 // 建物の描画
@@ -130,7 +153,25 @@ glbloader.load(
   }
 );
 
-// スマホの描画
+// // スマホの描画
+glbloader.load(
+  glbUrls[2],
+  function (gltf) {
+    for (let g = 1; g < 10; g++) {
+      model = gltf.scene.clone();
+      model.scale.set(18, 18, 18);
+      model.rotation.set(0, Math.PI / 4, Math.PI / 4);
+      const randomIndex = Math.floor(Math.random() * 3); // 0 、1 、2 のランダム
+      model.position.set(course[randomIndex], 2, -10 * g);
+      phone_list.push(model); // オブジェクトのバウンディングボックスを計算
+      scene.add(model);
+    }
+  },
+  undefined,
+  function (error) {
+    console.error(error);
+  }
+);
 // ここに記述
 
 // 障害物の描画
@@ -247,6 +288,7 @@ document.addEventListener("DOMContentLoaded", function () {
 // プレイヤーの移動
 function move() {
   // ここに追加
+  player.position.z -= 0.2;
 }
 
 // プレイヤーのジャンプ
@@ -293,16 +335,21 @@ function animate() {
 
   // Mixer
   // ここに追加
+  if (mixer) {
+    mixer.update(0.01); // 時間の経過量
+  }
 
   if (player) {
     // 移動関数の実行
-    // ここに追加
+    move();
     // ジャンプ関数の実行
     // ここに追加
     // 衝突判定関数の実行
     // ここに追加
     // カメラの移動
-    // ここに追加
+    camera.position.set(0, 8, player.position.z + 10);
+    camera.lookAt(new Vector3(0, 5, player.position.z));
+  
   }
   renderer.render(scene, camera);
 }
