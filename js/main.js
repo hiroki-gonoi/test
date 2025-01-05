@@ -16,7 +16,6 @@ import {
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { GLTFLoader } from "loaders";
 
-
 // 各変数、各定数の宣言
 // レーンの設定
 let index = 1;
@@ -99,7 +98,7 @@ const textureUrls = [
 
 // 読み込む GLB モデルのパス
 const glbUrls = [
-  "models/player.glb", // プレイヤー
+  "models/player_spare.glb", // プレイヤー
   "models/houses.glb", // 周りの建物
   "models/phone.glb" // スマホ
 ];
@@ -113,10 +112,12 @@ glbloader.load(
   glbUrls[0],
   function (gltf) {
     player = gltf.scene;
-    player.scale.set(2,2,2);
+    player.scale.set(3, 2, 3);
     player.rotation.set(0, Math.PI, 0);
     player.position.set(0, 0, 0);
-    mixer = new AnimationMixer(player); // 解説 1
+
+
+mixer = new AnimationMixer(player); // 解説 1
     const runningAction = gltf.animations.find(
       (animation) => animation.name === "running"
     ); // 解説 2
@@ -125,6 +126,8 @@ glbloader.load(
     } else {
       console.warn("Running animation not found in the model.");
     }
+
+
     scene.add(player);
   },
   undefined,
@@ -132,7 +135,8 @@ glbloader.load(
     console.error(error);
   }
 );
-// ここに記述
+
+
 
 // 建物の描画
 glbloader.load(
@@ -153,13 +157,13 @@ glbloader.load(
   }
 );
 
-// // スマホの描画
+// スマホの描画
 glbloader.load(
   glbUrls[2],
   function (gltf) {
     for (let g = 1; g < 10; g++) {
       model = gltf.scene.clone();
-      model.scale.set(18, 18, 18);
+      model.scale.set(15, 15, 15);
       model.rotation.set(0, Math.PI / 4, Math.PI / 4);
       const randomIndex = Math.floor(Math.random() * 3); // 0 、1 、2 のランダム
       model.position.set(course[randomIndex], 2, -10 * g);
@@ -221,12 +225,14 @@ textureloader.load(
     console.error(error);
   }
 );
-// ここに記述
+
+
 
 // センサの値の読み取り
 document.addEventListener("DOMContentLoaded", function () {
   (aX = 0), (aY = 0), (aZ = 0);
   (alpha = 0), (beta = 0), (gamma = 0);
+  
 
   // 一度だけ実行
   if (!isOnce) {
@@ -248,7 +254,6 @@ document.addEventListener("DOMContentLoaded", function () {
       aY = dat.accelerationIncludingGravity.y || 0;
       aZ = dat.accelerationIncludingGravity.z || 0;
     } else {
-      // android の時
       aX = -1 * dat.accelerationIncludingGravity.x || 0;
       aY = -1 * dat.accelerationIncludingGravity.y || 0;
       aZ = -1 * dat.accelerationIncludingGravity.z || 0;
@@ -299,6 +304,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 // プレイヤーの移動
 function move() {
+  // ここに追加
   player.position.z -= 0.2;
   if (gamma > 20) {
     if (index == 0 || index == 1) {
@@ -344,23 +350,21 @@ function collision() {
   playerBox.updateWorldMatrix(true, true);
   const playerBoundingBox = new Box3().setFromObject(playerBox);
   helper = new Box3Helper(playerBoundingBox, 0xff0000);
-  scene.add(helper);
+  // scene.add(helper);
 
   // 障害物との衝突
   enemy_list = enemy_list.filter((enemy) => {
     const enemyBoundingBox = new Box3().setFromObject(enemy);
     helper = new Box3Helper(enemyBoundingBox, 0xff0000);
     scene.add(helper);
-  
-  const isCollided = playerBoundingBox.intersectsBox(enemyBoundingBox)
-  if (isCollided) {
-    window.location.href = "./index.html";
-    return false; // この敵を削除
-  }
-  return true; // この敵を保持
-  // ここまで
-});
 
+    const isCollided = playerBoundingBox.intersectsBox(enemyBoundingBox)
+    if (isCollided) {
+      window.location.href = "./index.html";
+      return false; // この敵を削除
+    }
+    return true; // この敵を保持
+  });
 
   // スマホとの衝突
   phone_list = phone_list.filter((phone) => {
@@ -369,13 +373,14 @@ function collision() {
     scene.add(helper);
 
     const isCollided = playerBoundingBox.intersectsBox(phoneBoundingBox)
-  if (isCollided) {
-    scene.remove(phone);
-    return false; // このスマホを削除
-  }
-  return true; // このスマホを保持
-  // ここまで
-});
+    if (isCollided) {
+      scene.remove(phone);
+      return false; // このスマホを削除
+    }
+    return true; // このスマホを保持
+    // ここまで
+  
+  });
 
   // ゴールとの衝突
   if (goal) {
@@ -402,11 +407,10 @@ function animate() {
     // ジャンプ関数の実行
     jump();
     // 衝突判定関数の実行
-    // ここに追加
+    collision(); 
     // カメラの移動
     camera.position.set(0, 8, player.position.z + 10);
     camera.lookAt(new Vector3(0, 5, player.position.z));
-  
   }
   renderer.render(scene, camera);
 }
