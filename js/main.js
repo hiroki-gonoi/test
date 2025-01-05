@@ -315,7 +315,17 @@ function move() {
 
 // プレイヤーのジャンプ
 function jump() {
-  // ここに追加
+  if (!isJumping && aZ > 0) {
+    player_v_y = initial_velocity;
+    isJumping = true;
+  } else if (isJumping) {
+    player_v_y -= gravity;
+    player.position.y += player_v_y;
+    if (player.position.y <= 0) {
+      isJumping = false;
+      player.position.y = 0;
+    }
+  }
 }
 
 // 衝突判定
