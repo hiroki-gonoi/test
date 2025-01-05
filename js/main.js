@@ -301,11 +301,15 @@ document.addEventListener("DOMContentLoaded", function () {
 function move() {
   player.position.z -= 0.2;
   if (gamma > 20) {
-    index += 1;
-    player.position.x = course[index];
+    if (index == 0 || index == 1) {
+      index += 1;
+      player.position.x = course[index];
+    }
   } else if (gamma < -20) {
-    index -= 1;
-    player.position.x = course[index];
+    if (index == 1 || index == 2) {
+      index -= 1;
+      player.position.x = course[index];
+    }
   }
 }
 
